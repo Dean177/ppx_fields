@@ -1,0 +1,36 @@
+{
+  "name": "ppx_fields",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "esy dune runtest",
+    "demo": "esy ocamlfind ppx_tools/rewriter _build/default/bin/bin.exe demo/src/demo.ml",
+    "dev": "esy ocamlfind ppx_tools/rewriter _build/default/bin/bin.exe test/test.ml",
+    "ast:input": "esy ocamlfind ppx_tools/dumpast test/test.ml",
+    "ast:actual": "esy ocamlfind ppx_tools/dumpast test.actual.ml",
+    "ast:expected": "esy ocamlfind ppx_tools/dumpast test/test.expected.ml"
+  },
+  "esy": {
+     "build": "refmterr dune build -p #{self.name}",
+    "buildsInSource": "_build",
+    "release": {
+      "releasedBinaries": [
+        "bin.exe"
+      ]
+    }
+  },
+  "dependencies": {
+    "@esy-ocaml/reason": "*",
+    "@opam/dune": ">=1.6.0",
+    "@opam/ocaml-migrate-parsetree": "1.2.0",
+    "@opam/ppx_tools": "*",
+    "ocaml": "~4.2.3",
+    "refmterr": "*"
+  },
+  "resolutions": {
+    "@opam/menhir": "20171013",
+    "@opam/re": "1.8.0"
+  },
+  "devDependencies": {
+    "@opam/merlin": "*"
+  }
+}

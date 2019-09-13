@@ -1,0 +1,18 @@
+{
+  "name": "demo",
+  "version": "0.1.0",
+  "scripts": {
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "run": "node src/demo.bs.js"
+  },
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "bs-platform": "^5.0.6"
+  }
+}

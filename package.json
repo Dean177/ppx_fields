@@ -1,0 +1,13 @@
+{
+  "name": "ppx_fields",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "esy build",
+    "clean": "esy dune clean",
+    "start": "esy dune build -w",
+    "test": "esy test",
+    "//": "The readme instructions expect 'ppx' to be in node_modules/ppx_fields/ppx",
+    "postinstall": "esy build && cp _build/default/bin/bin.exe ppx"
+  }
+}

@@ -1,0 +1,5 @@
+(executable
+ (name bin)
+ (public_name ppx_fields)
+ (libraries ppx_fields)
+ (ocamlopt_flags (-linkall)))

@@ -1,0 +1,23 @@
+(rule
+ (targets test.result.ml)
+ (deps test.ml)
+ (action
+   (system "ocamlfind ppx_tools/rewriter ../bin/bin.exe %{deps} >> %{targets}")
+ )
+)
+
+
+(rule
+ (targets unannotated.result.ml)
+ (deps unannotated.ml)
+ (action
+   (system "ocamlfind ppx_tools/rewriter ../bin/bin.exe %{deps} >> %{targets}")
+ )
+)
+
+(alias
+ (name runtest)
+ (action
+  (diff test.expected.ml test.result.ml)
+;  (diff unannotated.ml unannotated.result.ml)
+  ))

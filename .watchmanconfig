@@ -1,0 +1,14 @@
+{
+  "ignore_dirs": [
+    ".git",
+    "_build",
+    "_esy",
+    ".github",
+    "bin",
+    "demo",
+    "esy.lock",
+    "node_modules",
+    "src",
+    "test"
+  ]
+}

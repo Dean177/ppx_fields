@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node_version: [10]
+        os: [ubuntu-latest, macOS-latest]
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js ${{ matrix.node_version }}
+        uses: actions/setup-node@v1
+        with:
+          version: ${{ matrix.node_version }}
+
+      - name: esy install
+        run: |
+          export OS=$(uname | tr '[A-Z]' '[a-z]')
+          npm i -g esy
+          esy install
+
+      - name: esy build
+        run: |
+          esy build
+
+      - name: esy test
+        run: |
+          esy build
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: _build/default/bin/bin.exe
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: actions/download-artifact@master
+        with:
+          name: ubuntu-latest
+          path: packages/linux
+
+      - uses: actions/download-artifact@master
+        with:
+          name: macOS-latest
+          path: packages/darwin
+
+      - name: Use Node.js 10
+        uses: actions/npm@master
+        with:
+          version: 10
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish
+        run: |
+          export PACKAGE_VERSION=$(cat $GITHUB_WORKSPACE/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+          mkdir -p $GITHUB_WORKSPACE/ppx_fields
+          mv $GITHUB_WORKSPACE/packages/darwin/bin.exe $GITHUB_WORKSPACE/ppx_fields/darwin
+          mv $GITHUB_WORKSPACE/packages/linux/bin.exe $GITHUB_WORKSPACE/ppx_fields/linux
+          POSTINSTALL="\"if test -f \$(uname | tr '[A-Z]' '[a-z]'); then mv \$(uname | tr '[A-Z]' '[a-z]') ./ppx; chmod +x ./ppx; fi\""
+          echo "{\"name\": \"ppx_fields\", \"version\": \"$PACKAGE_VERSION\", \"scripts\": { \"postinstall\": $POSTINSTALL } }" > $GITHUB_WORKSPACE/ppx_fields/package.json
+          echo "//registry.npmjs.org/:_authToken:${NPM_AUTH_TOKEN}" > $HOME/.npmrc
+          # cd $GITHUB_WORKSPACE/ppx_fields/ && npm publish
+          cd $GITHUB_WORKSPACE/ppx_fields/ && npm pack
+          mv $GITHUB_WORKSPACE/ppx_fields/ppx_fields-$PACKAGE_VERSION.tgz $GITHUB_WORKSPACE/ppx_fields/package.tgz
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: package
+          path: ppx_fields/package.tgz
